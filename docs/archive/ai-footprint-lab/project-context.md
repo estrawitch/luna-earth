@@ -286,6 +286,7 @@ How can we explain the environmental and economic trade-offs of artificial intel
 - What role does cooling play?
 - Why does water use depend on location, cooling method, and climate?
 - How can data centers reduce water consumption?
+- If a community is running out of water, can use drinkable/public water temporarily, but with clear consequences.
 
 ### AI and Economics
 

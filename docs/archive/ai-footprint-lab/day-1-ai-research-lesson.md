@@ -13,9 +13,9 @@ This lesson is structured as the first milestone of a selective-university portf
 
 ##
 
-- [day-1.md](/home/kevin/coding/austin/day-1.md)
-- [gpt-context.md](/home/kevin/coding/austin/gpt-context.md)
-- [curriculum.md](/home/kevin/coding/austin/curriculum.md)
+- [day-1-research-before-code.md](day-1-research-before-code.md)
+- [project-context.md](project-context.md)
+- [nine-week-curriculum.md](nine-week-curriculum.md)
 
 ## Lesson goal
 
@@ -25,21 +25,21 @@ At the end of the hour, the student can define the project purpose, choose a tar
 
 No code yet. Open these files in the same session:
 
-- [day-1.md](/home/kevin/coding/austin/day-1.md)
-- [gpt-context.md](/home/kevin/coding/austin/gpt-context.md)
+- [day-1-research-before-code.md](day-1-research-before-code.md)
+- [project-context.md](project-context.md)
 
 ## Timeplan (60 minutes)
 
 ## 0-10 min: Warm-up and framing
 
-- Read the core project context aloud from [gpt-context.md](/home/kevin/coding/austin/gpt-context.md) “One-Sentence Pitch” and “Core Idea.”
+- Read the core project context aloud from [project-context.md](project-context.md) “One-Sentence Pitch” and “Core Idea.”
 - Define a one-sentence project question:
   - Example: How can we explain AI’s environmental and social benefits and costs in a balanced, student-friendly way?
 - Write this in the notebook as the day anchor.
 
 ## 10-20 min: Choose scope for Day 1
 
-- Use [day-1.md](/home/kevin/coding/austin/day-1.md) Step 2 and pick **one** audience only:
+- Use [day-1-research-before-code.md](day-1-research-before-code.md) Step 2 and pick **one** audience only:
   - Middle/high school students
   - Selective audience, teachers, and parents as supporting examples
 - Decide one sentence for audience:
@@ -51,7 +51,7 @@ No code yet. Open these files in the same session:
 
 ## 20-35 min: Research map from existing anchors
 
-- Use Step 4 and Research Categories in [day-1.md](/home/kevin/coding/austin/day-1.md) as the map:
+- Use Step 4 and Research Categories in [day-1-research-before-code.md](day-1-research-before-code.md) as the map:
   - AI in software engineering
   - Environmental costs
   - Economic impact
@@ -69,7 +69,7 @@ No code yet. Open these files in the same session:
 
 ## 35-50 min: AI research sprint
 
-- Start with the anchor source section in [gpt-context.md](/home/kevin/coding/austin/gpt-context.md) “Key Source Anchors To Research And Cite.”
+- Start with the anchor source section in [project-context.md](project-context.md) “Key Source Anchors To Research And Cite.”
 - Capture at least one source from each anchor:
   - AI energy and data centers
   - U.S. data center energy growth
@@ -83,7 +83,7 @@ No code yet. Open these files in the same session:
 
 ## 50-60 min: Convert research to site content plan
 
-- Open [curriculum.md](/home/kevin/coding/austin/curriculum.md) Week 1 and map 4 content blocks:
+- Open [nine-week-curriculum.md](nine-week-curriculum.md) Week 1 and map 4 content blocks:
   - Hero message
   - One benefit section
   - One cost section
