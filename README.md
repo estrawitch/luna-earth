@@ -58,14 +58,19 @@ npm run build
 - [Homepage](app/page.tsx) introduces AI Footprint Lab.
 - [Global styles](app/globals.css) load Tailwind CSS and set the base font.
 - [App layout](app/layout.tsx) sets page metadata and wraps the homepage.
+- The current app is still the Week 1 starter homepage from the active
+  AI Footprint Lab curriculum.
 
 ## Current Product Docs
 
-- [Simulation game spec](docs/current/simulation-game-spec.md)
-- [Scope lock](docs/current/scope-lock.md)
+- [Project context](docs/current/ai-footprint-lab/project-context.md)
+- [Nine-week curriculum](docs/current/ai-footprint-lab/nine-week-curriculum.md)
+- [Brain vs AI slider UX spec](docs/current/ai-footprint-lab/brain-vs-ai-slider-ux-spec.md)
+- [First Codex starter prompt](docs/current/ai-footprint-lab/first-codex-starter-prompt.md)
 
 ## Archived Context
 
-Older AI Footprint Lab material has been moved to
-[docs/archive/ai-footprint-lab](docs/archive/ai-footprint-lab/). It is preserved
-for reference and was used for this starter homepage.
+The Water + Electricity + Air Quality Simulation Game has been moved to archive:
+
+- [Simulation game spec](docs/archive/simulation-game-spec.md)
+- [Scope lock](docs/archive/scope-lock.md)
