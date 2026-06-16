@@ -1,30 +1,63 @@
-# Water + Electricity + Air Quality Simulation Game
+# AI Footprint Lab
 
-This repo now centers on a frontend-only educational simulation game where
-students run a city utility system and balance water, electricity, budget,
-reliability, and air-quality trade-offs. It is designed as a portfolio-ready
-software project for explaining environmental systems in plain language: the
-player can save water with no-water cooling, but must see the electricity,
-pollution, and reliability consequences instead of treating conservation as a
-one-variable problem.
+AI Footprint Lab is a small frontend-only educational website about the
+environmental and economic trade-offs of artificial intelligence. The first
+version is intentionally simple: one homepage with a clear title, mission
+statement, and three preview cards.
 
-The strongest review signal in this repo is the product framing. The current
-documents define a scoped, teachable simulation that a beginner can build in
-short lessons while still showing systems thinking, finite-resource modeling,
-user-facing explanation, and careful handling of assumptions.
+The site explains that AI can be useful while also depending on real-world
+infrastructure such as servers, data centers, chips, electricity, and cooling.
+The goal is balanced student-friendly learning, not fearmongering or hype.
 
-## Tech Stack And Why Chosen
+## Tech Stack
 
-- **Markdown product docs:** keeps the current scope readable, reviewable, and
-  easy to revise before app scaffolding begins.
-- **Frontend-only app target:** avoids backend, account, database, and API
-  complexity so the project can focus on the simulation loop and learning
-  experience.
-- **Planned Next.js, React, TypeScript, and Tailwind CSS:** matches the current
-  scope lock and gives the eventual implementation a modern deployable web
-  stack with typed simulation state and beginner-readable UI components.
-- **Static local data:** keeps scenarios, actions, formulas, sources, and
-  assumptions transparent enough for students and reviewers to inspect.
+- **Next.js:** runs the website and provides the app folder structure.
+- **React:** builds the homepage as reusable UI pieces.
+- **TypeScript:** checks the code for common mistakes.
+- **Tailwind CSS:** styles the page with readable utility classes.
+
+This project is frontend only. It does not use a backend, database, login,
+secret keys, paid APIs, or live AI calls.
+
+## Getting Started
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Run the local development server:
+
+```bash
+npm run dev
+```
+
+Then open [http://localhost:3000](http://localhost:3000) in a browser.
+
+On Windows, you can also run one of these helper scripts:
+
+```bash
+.\run-homepage.ps1
+```
+
+or:
+
+```bash
+run-homepage.bat
+```
+
+Build the site for production:
+
+```bash
+npm run build
+```
+
+## Current App
+
+- [Homepage](app/page.tsx) introduces AI Footprint Lab.
+- [Global styles](app/globals.css) load Tailwind CSS and set the base font.
+- [App layout](app/layout.tsx) sets page metadata and wraps the homepage.
 
 ## Current Product Docs
 
@@ -35,26 +68,4 @@ user-facing explanation, and careful handling of assumptions.
 
 Older AI Footprint Lab material has been moved to
 [docs/archive/ai-footprint-lab](docs/archive/ai-footprint-lab/). It is preserved
-for reference, but it is no longer the active product direction.
-
-## Bootstrap From Source
-
-No dependency install is required yet. This repository currently contains
-product planning documents only, not a scaffolded web app.
-
-From a checked-out copy, start with the current product docs above and keep new
-active-product notes under `docs/current/`.
-
-## Day-to-Day Usage
-
-- Update `docs/current/` for active simulation-game scope, formulas, screens,
-  scenarios, and assumptions.
-- Move superseded product ideas to `docs/archive/` instead of deleting them.
-- Update this README when app scaffolding, commands, deployment, or product
-  behavior changes.
-
-## Commands And Flags
-
-There are no README-documented project commands or command-line flags yet. Once
-the app is scaffolded, this section should document install, local development,
-type-checking, tests, and build commands with any meaningful options.
+for reference and was used for this starter homepage.
