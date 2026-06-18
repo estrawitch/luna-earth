@@ -14,4 +14,5 @@ trade-offs of artificial intelligence.
 - `first-codex-starter-prompt.md`: starter homepage prompt.
 - `day-1-research-before-code.md`: research-first lesson plan.
 - `day-1-ai-research-lesson.md`: day-one AI research lesson.
+- `week-2-source-backed-statistics-spec.md`: quantified statistics section spec.
 - `brain-vs-ai-slider-ux-spec.md`: interactive Brain vs AI slider spec.
