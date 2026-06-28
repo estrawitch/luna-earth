@@ -139,7 +139,7 @@ export const impactStats: ImpactStat[] = [
     whyAlarming:
       "This home comparison shows why TWh numbers are not small: one data-center statistic can equal the yearly electricity use of millions of households.",
     plainLanguageMeaning:
-      "This conversion helps users understand data-center electricity in household terms.",
+      "One average U.S. home uses about 10.8 megawatt-hours of electricity each year.",
     caveat:
       "Household electricity use varies by state, home size, climate, and whether a home has solar panels."
   }

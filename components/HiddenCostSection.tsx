@@ -156,7 +156,10 @@ function PhysicalFootprintFlow() {
 
 export function HiddenCostSection() {
   return (
-    <section className="w-full bg-slate-50 px-6 py-16 text-slate-950 sm:px-8">
+    <section
+      className="w-full scroll-mt-28 bg-white px-6 py-16 text-slate-950 sm:px-8"
+      id="hidden-costs"
+    >
       <div className="mx-auto max-w-6xl">
         <div className="max-w-3xl">
           <p className="text-sm font-semibold uppercase tracking-wide text-teal-700">

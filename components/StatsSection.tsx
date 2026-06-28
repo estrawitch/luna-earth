@@ -1,24 +1,23 @@
 import { ElectricityInfographic } from "./ElectricityInfographic";
 import { impactStats } from "../data/impactStats";
-import { DataCenterComparison } from "./DataCenterComparison";
 import { InfrastructureImagePanel } from "./InfrastructureImagePanel";
 import { StatCard } from "./StatCard";
 import { WaterInfographic } from "./WaterInfographic";
 
 export function StatsSection() {
   return (
-    <section className="w-full bg-white px-6 py-16 text-slate-950 sm:px-8">
+    <section
+      className="w-full scroll-mt-28 bg-white px-6 py-16 text-slate-950 sm:px-8"
+      id="ai-footprint-by-the-numbers"
+    >
       <div className="mx-auto max-w-6xl">
         <div className="max-w-3xl">
-          <p className="text-sm font-semibold uppercase tracking-wide text-teal-700">
-            Week 2 Research Lab
-          </p>
-          <h2 className="mt-3 text-3xl font-bold leading-tight text-slate-950 sm:text-4xl">
-            Source-backed AI footprint statistics
+          <h2 className="text-3xl font-bold leading-tight text-slate-950 sm:text-4xl">
+            AI Footprint by the Numbers
           </h2>
           <p className="mt-4 text-base leading-7 text-slate-600">
-            These numbers are real, but the simulator uses random sampling because future
-            data-center impact is uncertain.
+            These numbers are real, and future data-center impact is uncertain enough
+            that low, likely, and high estimates matter.
           </p>
         </div>
 
@@ -47,10 +46,6 @@ export function StatsSection() {
         <div className="mt-10 grid gap-5 lg:grid-cols-2">
           <ElectricityInfographic />
           <WaterInfographic />
-        </div>
-
-        <div className="mt-10">
-          <DataCenterComparison />
         </div>
       </div>
     </section>

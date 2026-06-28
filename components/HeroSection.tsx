@@ -87,6 +87,7 @@ export function HeroSection() {
     <section
       aria-label="AI Footprint Lab introduction"
       className="relative flex min-h-[86vh] w-full items-center overflow-hidden bg-slate-950 px-6 py-14 text-white sm:px-8"
+      id="top"
       style={{
         ...heroSectionStyle,
         backgroundImage: `linear-gradient(90deg, rgba(2, 6, 23, 0.98), rgba(15, 23, 42, 0.88), rgba(15, 23, 42, 0.64)), url(${heroImage.localPath})`,

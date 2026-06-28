@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   dataCenterScenarios,
   type DataCenterScenario,
@@ -17,17 +17,8 @@ import {
 import { AssumptionsDrawer } from "./AssumptionsDrawer";
 import { CoolingTradeoffInfographic } from "./CoolingTradeoffInfographic";
 import { PerspectiveCallout } from "./PerspectiveCallout";
-import { UncertaintyHistogram } from "./UncertaintyHistogram";
 
 type OutputKind = "electricity" | "water" | "both";
-type RunMode = "single" | "10" | "100" | "1000" | "custom";
-
-type ResultSet = {
-  samples: number[];
-  average: number;
-  lowest: number;
-  highest: number;
-};
 
 const scenarioLabels: Record<ScenarioId, string> = {
   "no-added-ai": "No added AI",
@@ -36,30 +27,6 @@ const scenarioLabels: Record<ScenarioId, string> = {
   "ai-water-assisted": "Water-assisted cooling",
   "high-efficiency-future": "Higher-efficiency future"
 };
-
-function sampleTriangular(distribution: TriangularDistribution) {
-  const { min, likely, max } = distribution;
-
-  if (min === max) return min;
-
-  const u = Math.random();
-  const c = (likely - min) / (max - min);
-
-  if (u < c) {
-    return min + Math.sqrt(u * (max - min) * (likely - min));
-  }
-
-  return max - Math.sqrt((1 - u) * (max - min) * (max - likely));
-}
-
-function runSamples(distribution: TriangularDistribution, count: number): ResultSet {
-  const samples = Array.from({ length: count }, () => sampleTriangular(distribution));
-  const average = samples.reduce((sum, value) => sum + value, 0) / samples.length;
-  const lowest = Math.min(...samples);
-  const highest = Math.max(...samples);
-
-  return { samples, average, lowest, highest };
-}
 
 function formatNumber(value: number, maximumFractionDigits = 0) {
   return new Intl.NumberFormat("en-US", {
@@ -79,23 +46,6 @@ function getDistribution(
 ) {
   if (kind === "electricity") return scenario.electricityTwh[region];
   return scenario.directWaterLitersPerDay?.[region];
-}
-
-function getRunCount(mode: RunMode, customTrials: number) {
-  if (mode === "single") return 1;
-  if (mode === "custom") return customTrials;
-  return Number(mode);
-}
-
-function getCustomError(value: string) {
-  if (value.trim() === "") return "Enter a whole number from 1 to 10,000.";
-  if (!/^\d+$/.test(value)) return "Use a whole number without decimals.";
-
-  const parsed = Number(value);
-
-  if (parsed < 1) return "Use at least 1 trial.";
-  if (parsed > 10_000) return "Use 10,000 trials or fewer.";
-  return "";
 }
 
 function perspectiveSentence(kind: Exclude<OutputKind, "both">, value: number) {
@@ -118,80 +68,111 @@ function perspectiveSentence(kind: Exclude<OutputKind, "both">, value: number) {
   return `That is about ${formatNumber(litersToOneGallonJugs(value))} one-gallon jugs.`;
 }
 
+function getLikelyPosition(distribution: TriangularDistribution) {
+  if (distribution.min === distribution.max) return 50;
+  return ((distribution.likely - distribution.min) / (distribution.max - distribution.min)) * 100;
+}
+
+function RangeVisualization({ distribution }: { distribution: TriangularDistribution }) {
+  if (distribution.min === distribution.max) {
+    return (
+      <div
+        aria-label="Fixed estimate with no modeled spread"
+        className="rounded-lg border border-slate-200 bg-slate-50 p-4"
+      >
+        <div className="rounded-md bg-teal-700 px-4 py-8 text-center text-base font-bold text-white">
+          Fixed baseline: no modeled spread
+        </div>
+      </div>
+    );
+  }
+
+  const likelyPosition = getLikelyPosition(distribution);
+
+  return (
+    <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+      <div
+        aria-label={`Range from ${formatEstimate(distribution.min, distribution.unit)} to ${formatEstimate(
+          distribution.max,
+          distribution.unit
+        )}, with likely value ${formatEstimate(distribution.likely, distribution.unit)}`}
+        className="relative pt-7"
+        role="img"
+      >
+        <div className="h-3 rounded-full bg-gradient-to-r from-sky-300 via-teal-500 to-amber-400" />
+        <div
+          className="absolute top-0 flex -translate-x-1/2 flex-col items-center"
+          style={{ left: `${likelyPosition}%` }}
+        >
+          <span className="mb-1 rounded-full bg-slate-950 px-2 py-1 text-xs font-bold text-white">
+            Likely
+          </span>
+          <span className="h-6 w-1 rounded-full bg-slate-950" />
+        </div>
+        <div className="mt-4 flex justify-between gap-3 text-xs font-semibold text-slate-600">
+          <span>Low</span>
+          <span>High</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function ResultBlock({
   distribution,
-  kind,
-  mode,
-  result
+  kind
 }: {
   distribution?: TriangularDistribution;
   kind: Exclude<OutputKind, "both">;
-  mode: RunMode;
-  result?: ResultSet;
 }) {
-  if (!distribution || !result) return null;
-
-  const isSingle = mode === "single";
-  const current = result.samples[0] ?? 0;
+  if (!distribution) return null;
 
   return (
     <div className="space-y-4 rounded-lg border border-slate-200 bg-white p-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wide text-teal-700">
-            {isSingle ? "Random scenario" : "Many-run pattern"}
+            Source-backed range
           </p>
           <h3 className="mt-1 text-lg font-semibold text-slate-950">
             {kind === "electricity" ? "Electricity" : "Direct water"}
           </h3>
         </div>
         <p className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
-          Simulated estimate
+          Low / likely / high
         </p>
       </div>
 
-      {isSingle ? (
-        <p className="text-3xl font-bold leading-tight text-slate-950">
-          {formatEstimate(current, distribution.unit)}
-        </p>
-      ) : (
-        <>
-          <dl className="grid gap-3 sm:grid-cols-3">
-            <div className="rounded-lg bg-slate-50 p-3">
-              <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                Average
-              </dt>
-              <dd className="mt-1 text-lg font-bold text-slate-950">
-                {formatEstimate(result.average, distribution.unit)}
-              </dd>
-            </div>
-            <div className="rounded-lg bg-slate-50 p-3">
-              <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                Lowest
-              </dt>
-              <dd className="mt-1 text-lg font-bold text-slate-950">
-                {formatEstimate(result.lowest, distribution.unit)}
-              </dd>
-            </div>
-            <div className="rounded-lg bg-slate-50 p-3">
-              <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                Highest
-              </dt>
-              <dd className="mt-1 text-lg font-bold text-slate-950">
-                {formatEstimate(result.highest, distribution.unit)}
-              </dd>
-            </div>
-          </dl>
-          <UncertaintyHistogram distribution={distribution} samples={result.samples} />
-          <p className="text-sm leading-6 text-slate-600">
-            Running the simulation many times shows the pattern behind the random
-            numbers. One run is a possible future; many runs show which outcomes are
-            more common in the model.
-          </p>
-        </>
-      )}
+      <dl className="grid gap-3 sm:grid-cols-3">
+        <div className="rounded-lg bg-slate-50 p-3">
+          <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+            Low
+          </dt>
+          <dd className="mt-1 text-lg font-bold text-slate-950">
+            {formatEstimate(distribution.min, distribution.unit)}
+          </dd>
+        </div>
+        <div className="rounded-lg bg-teal-50 p-3">
+          <dt className="text-xs font-semibold uppercase tracking-wide text-teal-700">
+            Likely
+          </dt>
+          <dd className="mt-1 text-lg font-bold text-slate-950">
+            {formatEstimate(distribution.likely, distribution.unit)}
+          </dd>
+        </div>
+        <div className="rounded-lg bg-slate-50 p-3">
+          <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+            High
+          </dt>
+          <dd className="mt-1 text-lg font-bold text-slate-950">
+            {formatEstimate(distribution.max, distribution.unit)}
+          </dd>
+        </div>
+      </dl>
 
-      <PerspectiveCallout>{perspectiveSentence(kind, isSingle ? current : result.average)}</PerspectiveCallout>
+      <RangeVisualization distribution={distribution} />
+
+      <PerspectiveCallout>{perspectiveSentence(kind, distribution.likely)}</PerspectiveCallout>
 
       <div className="space-y-2 text-sm leading-6 text-slate-600">
         <p>
@@ -211,46 +192,16 @@ export function DataCenterComparison() {
   const [region, setRegion] = useState<RegionScale>("global");
   const [scenarioId, setScenarioId] = useState<ScenarioId>("ai-base-growth");
   const [output, setOutput] = useState<OutputKind>("both");
-  const [runMode, setRunMode] = useState<RunMode>("single");
-  const [customInput, setCustomInput] = useState("250");
-  const [reroll, setReroll] = useState(0);
-  const [electricityResult, setElectricityResult] = useState<ResultSet>();
-  const [waterResult, setWaterResult] = useState<ResultSet>();
 
   const scenario = useMemo(
     () => dataCenterScenarios.find((item) => item.id === scenarioId) ?? dataCenterScenarios[0],
     [scenarioId]
   );
-  const customError = runMode === "custom" ? getCustomError(customInput) : "";
-  const customTrials = customError ? 1 : Number(customInput);
-  const runCount = getRunCount(runMode, customTrials);
   const electricityDistribution = getDistribution(scenario, "electricity", region);
   const waterDistribution = getDistribution(scenario, "water", region);
   const showElectricity = output === "electricity" || output === "both";
   const showWater = output === "water" || output === "both";
   const globalWaterLimited = region === "global" && showWater && !waterDistribution;
-
-  useEffect(() => {
-    if (electricityDistribution && showElectricity) {
-      setElectricityResult(runSamples(electricityDistribution, runCount));
-    } else {
-      setElectricityResult(undefined);
-    }
-
-    if (waterDistribution && showWater && !customError) {
-      setWaterResult(runSamples(waterDistribution, runCount));
-    } else {
-      setWaterResult(undefined);
-    }
-  }, [
-    electricityDistribution,
-    waterDistribution,
-    showElectricity,
-    showWater,
-    runCount,
-    reroll,
-    customError
-  ]);
 
   return (
     <section
@@ -263,24 +214,16 @@ export function DataCenterComparison() {
             Interactive comparison
           </p>
           <h2 className="mt-2 text-2xl font-bold text-slate-950" id="comparison-heading">
-            What happens if AI is not used?
+            Compare low, likely, and high AI infrastructure estimates
           </h2>
           <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">
-            This simulator generates one plausible outcome from a documented probability
-            model. Values near the most likely estimate appear more often than values near
-            the outer support bounds.
+            Choose a region, scenario, and output to see the range behind each estimate.
+            The likely value is the center of the classroom model.
           </p>
         </div>
-        <button
-          className="rounded-lg bg-teal-700 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-teal-800 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
-          onClick={() => setReroll((value) => value + 1)}
-          type="button"
-        >
-          {runMode === "single" ? "Generate another scenario" : "Run simulation"}
-        </button>
       </div>
 
-      <div className="mt-6 grid gap-4 lg:grid-cols-5">
+      <div className="mt-6 grid gap-4 lg:grid-cols-4">
         <label className="text-sm font-semibold text-slate-800">
           Region
           <select
@@ -320,49 +263,7 @@ export function DataCenterComparison() {
             <option value="both">Both</option>
           </select>
         </label>
-
-        <label className="text-sm font-semibold text-slate-800">
-          Run mode
-          <select
-            className="mt-2 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-950 focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-500"
-            onChange={(event) => setRunMode(event.target.value as RunMode)}
-            value={runMode}
-          >
-            <option value="single">Single run</option>
-            <option value="10">10 runs</option>
-            <option value="100">100 runs</option>
-            <option value="1000">1,000 runs</option>
-            <option value="custom">Custom n trials</option>
-          </select>
-        </label>
       </div>
-
-      {runMode === "custom" ? (
-        <div className="mt-4 max-w-sm">
-          <label className="text-sm font-semibold text-slate-800">
-            Custom n trials
-            <input
-              aria-describedby="custom-trials-help custom-trials-error"
-              className="mt-2 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-950 focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-500"
-              inputMode="numeric"
-              max={10_000}
-              min={1}
-              onChange={(event) => setCustomInput(event.target.value)}
-              value={customInput}
-            />
-          </label>
-          <p className="mt-2 text-xs leading-5 text-slate-500" id="custom-trials-help">
-            Choose how many trials to run. This works like a coin-flip simulator:
-            one trial can be surprising, but many trials usually reveal the model&apos;s
-            pattern.
-          </p>
-          {customError ? (
-            <p className="mt-2 text-sm font-semibold text-red-700" id="custom-trials-error">
-              {customError}
-            </p>
-          ) : null}
-        </div>
-      ) : null}
 
       <div className="mt-6 rounded-lg border border-slate-200 bg-slate-50 p-4">
         <h3 className="text-base font-semibold text-slate-950">{scenario.label}</h3>
@@ -381,34 +282,22 @@ export function DataCenterComparison() {
         <CoolingTradeoffInfographic />
       </div>
 
-      {customError && runMode === "custom" ? null : (
-        <div aria-live="polite" className="mt-6 grid gap-5">
-          {showElectricity ? (
-            <ResultBlock
-              distribution={electricityDistribution}
-              kind="electricity"
-              mode={runMode}
-              result={electricityResult}
-            />
-          ) : null}
+      <div aria-live="polite" className="mt-6 grid gap-5">
+        {showElectricity ? (
+          <ResultBlock distribution={electricityDistribution} kind="electricity" />
+        ) : null}
 
-          {showWater && waterDistribution ? (
-            <ResultBlock
-              distribution={waterDistribution}
-              kind="water"
-              mode={runMode}
-              result={waterResult}
-            />
-          ) : null}
+        {showWater && waterDistribution ? (
+          <ResultBlock distribution={waterDistribution} kind="water" />
+        ) : null}
 
-          {globalWaterLimited ? (
-            <div className="rounded-lg border border-sky-200 bg-sky-50 p-5 text-sm leading-6 text-sky-950">
-              This v1 model has a source-backed U.S. water range and a large-facility
-              water example, but no source-backed global data-center water total.
-            </div>
-          ) : null}
-        </div>
-      )}
+        {globalWaterLimited ? (
+          <div className="rounded-lg border border-sky-200 bg-sky-50 p-5 text-sm leading-6 text-sky-950">
+            Global direct-water reporting is not strong enough here to show a sourced
+            range, but the United States view includes water estimates.
+          </div>
+        ) : null}
+      </div>
 
       <div className="mt-6 space-y-4">
         <p className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-950">
